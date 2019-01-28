@@ -1,0 +1,10 @@
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load("shiny")
+pacman::p_load("shinyjs")
+pacman::p_load("DT")
+pacman::p_load("shinymaterial")
+pacman::p_load("rtweet")
+pacman::p_load("dplyr")
+pacman::p_load("stringr")
+
+twitter_token <- readRDS(file = "twitter_token.rds")
