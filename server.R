@@ -58,12 +58,14 @@ function(input, output, session) {
   
   # Get tweets
   current_tweets <- shiny::eventReactive(input$search_twitter_now, {
-    rtweet::search_tweets(q = input$search_twitter_string,
-                          n = input$n_tweets,
-                          type = input$twitter_type_radio,
-                          include_rts = input$include_RT,
-                          token = twitter_token,
-                          lang = input$tweet_lang)
+ 
+        rtweet::search_tweets(q = input$search_twitter_string,
+                              n = input$n_tweets,
+                              type = input$twitter_type_radio,
+                              include_rts = input$include_RT,
+                              token = twitter_token,
+                              lang = input$tweet_lang)
+
   })
   
   
@@ -132,10 +134,84 @@ function(input, output, session) {
       )
     )
     
+    
     cards
     
   })
   
+  # output$n_tweets <- renderValueBox({
+  #   if(nrow(current_tweets()) == 0){
+  #     return(NULL)
+  #   }
+  #   valueBox( "Tweets extracted", scales::number(nrow(current_tweets())),
+  #             icon = icon("twitter"), color = "blue" )
+  # })
+  # 
+  # output$n_users <- renderValueBox({
+  #   if(nrow(current_tweets()) == 0){
+  #     return(NULL)
+  #   }
+  #   valueBox( "Number of users", scales::number(current_tweets() %>% 
+  #                                                 distinct(screen_name) %>% 
+  #                                                 nrow()), icon = icon("user"), color = "purple" )
+  # })
   
+  ####### Tweet wall ######
+  
+  
+  
+  output$wall <- renderUI({
+    
+    if(nrow(current_tweets()) == 0){
+      return(NULL)
+    }
+    
+    if (input$tweet_includes==0) {
+      tempTweets <- current_tweets()
+    } else {
+      tempTweets <- current_tweets() %>% 
+        filter(stringr::str_detect(string = text, pattern = input$tweet_includes))
+    }
+    
+    
+    wall <- tagList()
+    
+    for (i in 1:min(nrow(tempTweets), 9)) {
+      wall[[i]] <- material_column(
+        width = 3,
+        material_card(
+          HTML(
+            embed_tweet(id = tempTweets$status_id[i])
+          )
+        )
+      )
+    }
+    
+    
+    wall
+    
+  })
+  
+  
+  
+  
+  ##### UI ######
+  
+  #### Select project ui ####
+  
+  output$selectProject_UI <- shiny::renderUI({
+    
+    projects <- list.dirs(path = "projects",
+                          full.names = FALSE,
+                          recursive = FALSE)
+    
+    shiny::selectizeInput(inputId = "selected_projects",
+                          label = "Available projects",
+                          choices = as.list(c("", projects)),
+                          selected = "",
+                          multiple = TRUE,
+                          width = "95%")
+    
+  })
 
 }

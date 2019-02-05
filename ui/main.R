@@ -1,5 +1,6 @@
 hidden(fluidRow(
   id = "main",
+  tags$head(tags$script(src="https://platform.twitter.com/widgets.js")),
   material_page(
     title = "SocialAnalyseR",
     nav_bar_color = "teal lighten-3",
@@ -13,9 +14,10 @@ hidden(fluidRow(
         side_nav_tabs = c(
           "Extract Tweets" = "extract_tweets",
           "Explore Tweets" = "explore_tweets",
+          "Tweet wall" = "tweet_wall",
           "Explore Twitter users" = "explore_twitter_users"
         ),
-        icons = c("search", "explore", "people")
+        icons = c("search", "explore", "explore", "people")
       )
     ),
     
@@ -37,6 +39,10 @@ hidden(fluidRow(
                                     min = 0, max = 1000, value = 100, round = TRUE),
                  material_button(input_id = "search_twitter_now",
                                  label = "Search now!", icon = "search")),
+
+      ### Load project
+      # tags$h2("Load projects"),
+      # shiny::uiOutput(outputId = "selectProject_UI"),
       uiOutput("cards")
     ),
     material_side_nav_tab_content(
@@ -44,6 +50,13 @@ hidden(fluidRow(
       tags$h2("Explore tweets"),
       material_card(title = "Tweets", 
                     DT::dataTableOutput(outputId = "tweets"))
+    ),
+    material_side_nav_tab_content(
+      side_nav_tab_id = "tweet_wall",
+      tags$h2("Tweet wall"),
+      inputPanel(textInput(inputId = "tweet_includes", label = "Tweet includes")),
+      uiOutput("wall")
+      
     ),
     material_side_nav_tab_content(
       side_nav_tab_id = "explore_twitter_users",
