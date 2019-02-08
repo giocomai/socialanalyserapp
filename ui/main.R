@@ -50,8 +50,7 @@ hidden(fluidRow(
       tags$h2("Explore tweets"),
       material_card(title = "Tweets", 
                     DT::DTOutput(outputId = "tweets")),
-      material_card(title = "Testing selection",
-                    verbatimTextOutput('tweets_selected_output'))
+      material_card(uiOutput(outputId = "selected_tweets_wall"))
     ),
     material_side_nav_tab_content(
       side_nav_tab_id = "tweet_wall",

@@ -207,7 +207,33 @@ function(input, output, session) {
     wall
   })
   
-  
+  output$selected_tweets_wall <- renderUI({
+    
+    if(nrow(current_tweets()) == 0){
+      return(NULL)
+    }
+    
+    if (is.null(input$tweets_rows_selected)) {
+      return(NULL)
+    }
+    
+    tempTweets <- current_tweets() %>% 
+      slice(input$tweets_rows_selected)
+    
+    nrowTempTweets <- nrow(tempTweets)
+    
+    wall <- tagList()
+    
+    for (i in 1:nrowTempTweets) { 
+      wall[[i]] <- material_column(
+        width = 3,
+        material_card(
+          embed_tweet_js(id = tempTweets$status_id[i], i = i)
+        )
+      )
+    }
+    material_row(wall)
+  })
   
   
   ##### UI ######
