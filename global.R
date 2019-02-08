@@ -26,3 +26,7 @@ embed_tweet_js <- function(id, i) {
   }
 ); </script>"))
 }
+
+embed_profile <- function(screen_name) {
+  HTML(paste0('<a class="twitter-timeline" data-height="600" href="https://twitter.com/', screen_name, '">Tweets by ', screen_name, '</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>'))
+}

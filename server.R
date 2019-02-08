@@ -87,21 +87,7 @@ function(input, output, session) {
                     rownames = FALSE)
   }, server = TRUE)
   
-  output$explore_twitter_users_selected_output = renderPrint({
-    s = input$explore_twitter_users_rows_selected
-    if (length(s)) {
-      cat('These rows were selected:\n\n')
-      cat(s, sep = ', ')
-    }
-  })
   
-  output$tweets_selected_output = renderPrint({
-    s = input$tweets_rows_selected
-    if (length(s)) {
-      cat('These rows were selected:\n\n')
-      cat(s, sep = ', ')
-    }
-  })
   
   # daily_data <- reactiveFileReader(
   #   intervalMillis = 100,
@@ -117,8 +103,7 @@ function(input, output, session) {
     
     cards <- tagList()
     
-    cards[[1]] <- material_column(
-      width = 2,
+    cards[[1]] <- 
       material_card(
         title = HTML(
           "Tweets extracted"
@@ -126,24 +111,20 @@ function(input, output, session) {
         depth = 3,
         HTML(
           scales::number(nrow(current_tweets()))
-        )
+        ))
+    
+    cards[[2]] <- material_card(
+      title = HTML(
+        "Number of users"
+      ),
+      depth = 3,
+      HTML(
+        current_tweets() %>% 
+          distinct(screen_name) %>% 
+          nrow()
       )
     )
     
-    cards[[2]] <-     material_column(
-      width = 2,
-      material_card(
-        title = HTML(
-          "Number of users"
-        ),
-        depth = 3,
-        HTML(
-          current_tweets() %>% 
-            distinct(screen_name) %>% 
-            nrow()
-        )
-      )
-    )
     cards
   })
   
@@ -165,18 +146,18 @@ function(input, output, session) {
   # })
   
   ####### Tweet wall ######
-
+  
   output$wall <- renderUI({
     
     if(nrow(current_tweets()) == 0){
       return(NULL)
     }
     
-    if (input$tweet_includes==0) {
+    if (length(input$tweet_includes==0)) {
       tempTweets <- current_tweets()
     } else {
       tempTweets <- current_tweets() %>% 
-        filter(stringr::str_detect(string = text, pattern = input$tweet_includes))
+        filter(stringr::str_detect(string = text, pattern = stringr::regex(pattern = input$tweet_includes, ignore_case = TRUE)))
     }
     
     nrowTempTweets <- nrow(tempTweets)
@@ -236,6 +217,35 @@ function(input, output, session) {
   })
   
   
+  output$selected_profiles_wall <- renderUI({
+    
+    if(nrow(current_tweets()) == 0){
+      return(NULL)
+    }
+    
+    if (is.null(input$explore_twitter_users_rows_selected)) {
+      return(NULL)
+    }
+    
+    tempTweets <- current_tweets() %>% 
+      slice(input$explore_twitter_users_rows_selected)
+    
+    nrowTempTweets <- nrow(tempTweets)
+    
+    wall <- tagList()
+    
+    for (i in 1:nrowTempTweets) { 
+      wall[[i]] <- material_column(
+        width = 3,
+        material_card(
+          embed_profile(screen_name = tempTweets$screen_name[i])
+        )
+      )
+    }
+    material_row(wall)
+  })
+  
+  
   ##### UI ######
   
   #### Select project ui ####
@@ -252,6 +262,12 @@ function(input, output, session) {
                           selected = "",
                           multiple = TRUE,
                           width = "95%")
+    
+  })
+  
+  #### Create new project ####
+  
+  shiny::eventReactive(input$create_new_project_now, {
     
   })
   
