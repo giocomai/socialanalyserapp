@@ -1,73 +1,71 @@
 function(input, output, session) {
-
+  
   ##### Switch Views ------------------
   # if user click link to register, go to register view
   observeEvent(input$go_to_register, {
     shinyjs::show("register_panel", anim = TRUE, animType = "fade")
     shinyjs::hide("sign_in_panel")
   }, ignoreInit = TRUE)
-
+  
   observeEvent(input$go_to_sign_in, {
     shinyjs::hide("register_panel")
     shinyjs::show("sign_in_panel", anim = TRUE, animType = "fade")
   }, ignoreInit = TRUE)
-
+  
   # switch between auth sign in/registration and app for signed in user
   observeEvent(session$userData$current_user(), {
     current_user <- session$userData$current_user()
-
+    
     if (is.null(current_user)) {
       shinyjs::show("sign_in_panel")
       shinyjs::hide("main")
       shinyjs::hide("verify_email_view")
-
+      
     } else {
       shinyjs::hide("sign_in_panel")
       shinyjs::hide("register_panel")
-
+      
       if (current_user$emailVerified == TRUE) {
         shinyjs::show("main")
       } else {
         shinyjs::show("verify_email_view")
       }
-
+      
     }
-
+    
   }, ignoreNULL = FALSE)
-
-
-
-
+  
+  
+  
+  
   # Signed in user --------------------
   # the `session$userData$current_user()` reactiveVal will hold information about the user
   # that has signed in through Firebase.  A value of NULL will be used if the user is not
   # signed in
   session$userData$current_user <- reactiveVal(NULL)
-
+  
   # input$sof_auth_user comes from front end js in "www/sof-auth.js"
   observeEvent(input$sof_auth_user, {
-
+    
     # set the signed in user
     session$userData$current_user(input$sof_auth_user)
-
+    
   }, ignoreNULL = FALSE)
-
-
-
+  
+  
   ##### App for signed in user
   
   # Get tweets
   current_tweets <- shiny::eventReactive(input$search_twitter_now, {
- 
-        rtweet::search_tweets(q = input$search_twitter_string,
-                              n = input$n_tweets,
-                              type = input$twitter_type_radio,
-                              include_rts = input$include_RT,
-                              token = twitter_token,
-                              lang = input$tweet_lang)
-
+    
+    rtweet::search_tweets(q = input$search_twitter_string,
+                          n = input$n_tweets,
+                          type = input$twitter_type_radio,
+                          include_rts = input$include_RT,
+                          token = twitter_token,
+                          lang = input$tweet_lang)
+    
   })
-  
   
   output$tweets <- DT::renderDataTable({
     current_tweets() %>%
@@ -133,9 +131,7 @@ function(input, output, session) {
         )
       )
     )
-
     cards
-    
   })
   
   # output$n_tweets <- renderValueBox({
@@ -156,9 +152,7 @@ function(input, output, session) {
   # })
   
   ####### Tweet wall ######
-  
-  
-  
+
   output$wall <- renderUI({
     
     if(nrow(current_tweets()) == 0){
@@ -172,31 +166,32 @@ function(input, output, session) {
         filter(stringr::str_detect(string = text, pattern = input$tweet_includes))
     }
     
-    
+    nrowTempTweets <- nrow(tempTweets)
     wall <- tagList()
     
-    # for (i in 1:min(nrow(tempTweets), 9)) {
-    #   wall[[i]] <- material_column(
-    #     width = 3,
-    #     material_card(
-    #       HTML(
-    #         embed_tweet(id = tempTweets$status_id[i])
-    #       )
-    #     )
-    #   )
-    # }
-    
-    for (i in 1:min(nrow(tempTweets), 9)) {
-      wall[[i]] <- material_column(
-            width = 3,
-            material_card(
-              embed_tweet_js(id = tempTweets$status_id[i], i = i)
-            )
-      )
+    if (nrowTempTweets>20) {
+      for (i in 1:4) { #create four columns
+        j = (i*5-4)
+        wall[[i]] <- material_column(
+          width = 3,
+          material_card(embed_tweet_js(id = tempTweets$status_id[j], i = j)),
+          material_card(embed_tweet_js(id = tempTweets$status_id[j+1], i = j+1)),
+          material_card(embed_tweet_js(id = tempTweets$status_id[j+2], i = j+2)),
+          material_card(embed_tweet_js(id = tempTweets$status_id[j+3], i = j+3)),
+          material_card(embed_tweet_js(id = tempTweets$status_id[j+4], i = j+4))
+        )
+      }
+    } else {
+      for (i in 1:nrowTempTweets) { 
+        wall[[i]] <- material_column(
+          width = 3,
+          material_card(
+            embed_tweet_js(id = tempTweets$status_id[i], i = i)
+          )
+        )
+      }
     }
-    
     wall
-    
   })
   
   
@@ -220,5 +215,5 @@ function(input, output, session) {
                           width = "95%")
     
   })
-
+  
 }
