@@ -35,9 +35,6 @@ function(input, output, session) {
     
   }, ignoreNULL = FALSE)
   
-  
-  
-  
   # Signed in user --------------------
   # the `session$userData$current_user()` reactiveVal will hold information about the user
   # that has signed in through Firebase.  A value of NULL will be used if the user is not
@@ -67,7 +64,7 @@ function(input, output, session) {
     
   })
   
-  output$tweets <- DT::renderDataTable({
+  output$tweets <- DT::renderDT({
     current_tweets() %>%
       select(screen_name, text) %>% 
       DT::datatable(options = list(pageLength = 5,
@@ -75,9 +72,9 @@ function(input, output, session) {
                                    dom = "fpit"),
                     escape = FALSE,
                     rownames = FALSE)
-  })
+  }, server = TRUE)
   
-  output$explore_twitter_users <- DT::renderDataTable({
+  output$explore_twitter_users <- DT::renderDT({
     current_tweets() %>%
       distinct(user_id, .keep_all = TRUE) %>% 
       select(screen_name, description, followers_count, verified, account_created_at, profile_expanded_url) %>% 
@@ -88,6 +85,22 @@ function(input, output, session) {
                                    dom = "fpit"),
                     escape = FALSE,
                     rownames = FALSE)
+  }, server = TRUE)
+  
+  output$explore_twitter_users_selected_output = renderPrint({
+    s = input$explore_twitter_users_rows_selected
+    if (length(s)) {
+      cat('These rows were selected:\n\n')
+      cat(s, sep = ', ')
+    }
+  })
+  
+  output$tweets_selected_output = renderPrint({
+    s = input$tweets_rows_selected
+    if (length(s)) {
+      cat('These rows were selected:\n\n')
+      cat(s, sep = ', ')
+    }
   })
   
   # daily_data <- reactiveFileReader(

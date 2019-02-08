@@ -39,7 +39,7 @@ hidden(fluidRow(
                                     min = 0, max = 1000, value = 100, round = TRUE),
                  material_button(input_id = "search_twitter_now",
                                  label = "Search now!", icon = "search")),
-
+      
       ### Load project
       # tags$h2("Load projects"),
       # shiny::uiOutput(outputId = "selectProject_UI"),
@@ -49,7 +49,9 @@ hidden(fluidRow(
       side_nav_tab_id = "explore_tweets",
       tags$h2("Explore tweets"),
       material_card(title = "Tweets", 
-                    DT::dataTableOutput(outputId = "tweets"))
+                    DT::DTOutput(outputId = "tweets")),
+      material_card(title = "Testing selection",
+                    verbatimTextOutput('tweets_selected_output'))
     ),
     material_side_nav_tab_content(
       side_nav_tab_id = "tweet_wall",
@@ -62,7 +64,9 @@ hidden(fluidRow(
       side_nav_tab_id = "explore_twitter_users",
       tags$h2("Explore Twitter users"),
       material_card(title = "Bio and selected data", 
-                    DT::dataTableOutput(outputId = "explore_twitter_users"))
+                    DT::dataTableOutput(outputId = "explore_twitter_users")),
+      material_card(title = "Testing selection",
+                    verbatimTextOutput('explore_twitter_users_selected_output'))
     )
   )
 )
