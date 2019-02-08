@@ -15,7 +15,14 @@ embed_tweet <- function(id){
   url <- paste0("https://publish.twitter.com/oembed?url=https%3A%2F%2Ftwitter.com%2FInterior%2Fstatus%2F",
                 id)
    fromJSON(url)$html
-  # tweet <- HTML( )
-  # class( tweet ) <- c( "tweet", class(tweet) )
-  # tweet
+}
+
+embed_tweet_js <- function(id, i) {
+  HTML(paste0('<div id="tweetcontainer', i, '"></div>',
+"<script>twttr.widgets.createTweet('", id, "',
+  document.getElementById('tweetcontainer", i, "'),
+  {
+    theme: 'light'
+  }
+); </script>"))
 }

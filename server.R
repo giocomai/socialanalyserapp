@@ -133,8 +133,7 @@ function(input, output, session) {
         )
       )
     )
-    
-    
+
     cards
     
   })
@@ -176,17 +175,25 @@ function(input, output, session) {
     
     wall <- tagList()
     
+    # for (i in 1:min(nrow(tempTweets), 9)) {
+    #   wall[[i]] <- material_column(
+    #     width = 3,
+    #     material_card(
+    #       HTML(
+    #         embed_tweet(id = tempTweets$status_id[i])
+    #       )
+    #     )
+    #   )
+    # }
+    
     for (i in 1:min(nrow(tempTweets), 9)) {
       wall[[i]] <- material_column(
-        width = 3,
-        material_card(
-          HTML(
-            embed_tweet(id = tempTweets$status_id[i])
-          )
-        )
+            width = 3,
+            material_card(
+              embed_tweet_js(id = tempTweets$status_id[i], i = i)
+            )
       )
     }
-    
     
     wall
     
