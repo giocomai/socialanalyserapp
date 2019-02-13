@@ -16,9 +16,10 @@ hidden(fluidRow(
           "Manage projects" = "manage_projects",
           "Explore Tweets" = "explore_tweets",
           "Tweet wall" = "tweet_wall",
-          "Explore Twitter users" = "explore_twitter_users"
+          "Explore Twitter users" = "explore_twitter_users",
+          "Facebook engagement" = "explore_facebook_engagement"
         ),
-        icons = c("search", "folder", "explore", "dashboard", "people")
+        icons = c("search", "folder", "explore", "dashboard", "people", "thumb_up")
       )
     ),
     
@@ -43,6 +44,12 @@ hidden(fluidRow(
                         label = "Search now!", icon = "search")), width = 3),
       material_column(
         uiOutput("cards"),
+        width = 3
+      ),
+      material_column(
+        shinymaterial::material_card(title = "URL import",
+                                     shinymaterial::material_file_input(input_id = "url_input_file", label = "Upload csv"),
+                                     tableOutput("preview_urls")),
         width = 3
       )
     ),
@@ -85,6 +92,17 @@ hidden(fluidRow(
       material_card(title = "Bio and selected data", 
                     DT::dataTableOutput(outputId = "explore_twitter_users")),
       material_card(uiOutput(outputId = "selected_profiles_wall"))
+    ),
+    material_side_nav_tab_content(
+      side_nav_tab_id = "explore_facebook_engagement",
+      tags$h2("Explore Facebook engagement"),
+      material_button(input_id = "find_facebook_engagement_now",
+                      label = "Find FB engagement now!",
+                      icon = "search"),
+      material_card(title = "Facebook engagement on selected URLs", 
+                    DT::DTOutput(outputId = "fb_engagement_dt")),
+      downloadButton(outputId = "download_fb_engagement",
+                     label =  "Download as csv")
     )
   )
 ))

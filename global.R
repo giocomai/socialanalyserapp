@@ -10,6 +10,8 @@ pacman::p_load("stringr")
 pacman::p_load("jsonlite")
 
 twitter_token <- readRDS(file = "twitter_token.rds")
+facebook_token <- readRDS(file = "facebook_token.rds")
+
 
 embed_tweet <- function(id){
   url <- paste0("https://publish.twitter.com/oembed?url=https%3A%2F%2Ftwitter.com%2FInterior%2Fstatus%2F",
@@ -30,3 +32,10 @@ embed_tweet_js <- function(id, i) {
 embed_profile <- function(screen_name) {
   HTML(paste0('<a class="twitter-timeline" data-height="600" href="https://twitter.com/', screen_name, '">Tweets by ', screen_name, '</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>'))
 }
+
+find_fb_url_stats <- function(url, facebook_token) {
+  call <- paste0("https://graph.facebook.com/v3.2/?id=", url, "&fields=engagement&access_token=", facebook_token)
+  temp <- jsonlite::read_json(path = call)
+  as_tibble(temp$engagement)
+}
+

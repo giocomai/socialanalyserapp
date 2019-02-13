@@ -271,4 +271,77 @@ function(input, output, session) {
     
   })
   
+  
+  ##### Import CSV of urls ######
+  
+  current_urls <- shiny::eventReactive(input$url_input_file, {
+   
+      in_file <- input$url_input_file
+      
+      if (is.null(in_file)) return(NULL)
+      
+      as_tibble(read.csv(file = in_file$datapath, stringsAsFactors = FALSE))
+    
+  })
+  
+  output$preview_urls <- renderTable(
+    if (is.null(current_urls())==FALSE) {
+     current_urls() %>% 
+        rename(urls = 1) %>% 
+        select(urls) %>% 
+        slice(1:10)
+    }
+  )
+  
+  #### Facebook engagement
+  
+  
+  fb_engagement_df <- shiny::eventReactive(input$find_facebook_engagement_now, {
+    
+    #--- Show the spinner ---#
+    material_spinner_show(session, "fb_engagement_dt")
+    
+    in_file <- input$url_input_file
+    
+    if (is.null(in_file)) return(NULL)
+    
+    current_urls <- as_tibble(read.csv(file = in_file$datapath, stringsAsFactors = FALSE))
+    
+    if (is.null(current_urls())) return(NULL)
+    
+    all_urls <- current_urls() %>% 
+      pull(1)
+    
+    temp <- vector(mode = "list", length = length(all_urls))
+    
+    for (i in seq_along(all_urls)) {
+      temp[[i]] <- bind_cols(find_fb_url_stats(url = all_urls[i],
+                                               facebook_token = facebook_token),
+                             tibble(url = all_urls[i]))
+    }
+    
+    #--- Hide the spinner ---#
+    material_spinner_hide(session, "fb_engagement_dt")
+    
+    purrr::map_df(.x = temp, .f = bind_rows) %>% 
+      select(url, dplyr::everything())
+
+  })
+  
+  output$fb_engagement_dt <- DT::renderDT({
+    
+    fb_engagement_df()
+  
+  })
+  
+  output$download_fb_engagement <- downloadHandler(
+    filename = function() {
+      paste('fb_engagement-', Sys.Date(), '.csv', sep='')
+    },
+    content = function(con) {
+      write.csv(fb_engagement_df(), con)
+    }
+  )
+  
+  
 }
