@@ -25,11 +25,11 @@ function(input, output, session) {
       shinyjs::hide("sign_in_panel")
       shinyjs::hide("register_panel")
       
-      if (current_user$emailVerified == TRUE) {
+     # if (current_user$emailVerified == TRUE) {
         shinyjs::show("main")
-      } else {
-        shinyjs::show("verify_email_view")
-      }
+      # } else {
+      #   shinyjs::show("verify_email_view")
+      # }
       
     }
     
