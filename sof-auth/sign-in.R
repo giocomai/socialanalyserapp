@@ -46,9 +46,26 @@ div(
       style = "color: white; width: 100%;",
       type = "button",
       class = "btn btn-primary btn-lg",
-      "Sign In"
+      "Sign in"
     ),
     br(),
+    hr(),
+    tags$button(
+      id = "submit_login_with_fb",
+      style = "color: white; width: 100%;",
+      type = "button",
+      class = "btn btn-primary btn-lg",
+      "Login with Facebook"
+    ),
+    br(),
+    hr(),
+    tags$button(
+      id = "submit_login_with_twitter",
+      style = "color: white; width: 100%;",
+      type = "button",
+      class = "btn btn-primary btn-lg",
+      "Login with Twitter"
+    ),
     hr(),
     # br(),
     # actionLink(
