@@ -8,8 +8,8 @@ const config = {
 
 firebase.initializeApp(config);
 
-var provider = new firebase.auth.FacebookAuthProvider();
-var provider = new firebase.auth.TwitterAuthProvider();
+var provider_fb = new firebase.auth.FacebookAuthProvider();
+var provider_twitter = new firebase.auth.TwitterAuthProvider();
 
 const auth = firebase.auth();
 
@@ -29,7 +29,7 @@ $(document).on("click", "#submit_sign_in", () => {
 
 $(document).on("click", "#submit_login_with_fb", () => {
   
-  firebase.auth().signInWithPopup(provider).then(function(result) {
+  firebase.auth().signInWithPopup(provider_fb).then(function(result) {
   // This gives you a Facebook Access Token. You can use it to access the Facebook API.
   var token = result.credential.accessToken;
   // The signed-in user info.
@@ -53,7 +53,7 @@ $(document).on("click", "#submit_login_with_fb", () => {
 
 $(document).on("click", "#submit_login_with_twitter", () => {
 
-firebase.auth().signInWithPopup(provider).then(function(result) {
+firebase.auth().signInWithPopup(provider_twitter).then(function(result) {
   // This gives you a the Twitter OAuth 1.0 Access Token and Secret.
   // You can use these server side with your app's credentials to access the Twitter API.
   var token = result.credential.accessToken;
