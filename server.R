@@ -64,6 +64,16 @@ function(input, output, session) {
     
   })
   
+  current_tweets <- shiny::eventReactive(input$search_twitter_users_now, {
+    
+    rtweet::search_users(q = input$search_twitter_users_string,
+                         n = input$n_tweets_users,
+                         parse = TRUE,
+                         token = twitter_token,
+                         verbose = FALSE)
+    
+  })
+  
   output$tweets <- DT::renderDT({
     current_tweets() %>%
       select(screen_name, text) %>% 
@@ -123,6 +133,18 @@ function(input, output, session) {
           distinct(screen_name) %>% 
           nrow()
       )
+    )
+    
+    cards[[3]] <- material_card(
+      title = HTML(
+        "Export"
+      ),
+      depth = 3,
+      downloadButton(outputId = "download_twitter_users",
+                     label =  "Download twitter users"),
+      HTML("<div><hr /></div>"),
+      downloadButton(outputId = "download_tweets",
+                     label =  "Download tweets")
     )
     
     cards
@@ -340,6 +362,26 @@ function(input, output, session) {
     },
     content = function(con) {
       write.csv(fb_engagement_df(), con)
+    }
+  )
+  
+  output$download_twitter_users <- downloadHandler(
+    filename = function() {
+      paste('twitter_users-', Sys.Date(), '.csv', sep='')
+    },
+    content = function(con) {
+      write.csv(current_tweets() %>% 
+                  select(screen_name, name, description, location, followers_count, friends_count, account_created_at, verified, profile_expanded_url), con)
+    }
+  )
+  
+  output$download_tweets <- downloadHandler(
+    filename = function() {
+      paste('tweets-', Sys.Date(), '.csv', sep='')
+    },
+    content = function(con) {
+      write.csv(current_tweets() %>% 
+                  select(screen_name, text, user_id, status_id, created_at, source, reply_to_status_id, is_quote, is_retweet, favorite_count, retweet_count,  name, description, location, followers_count, friends_count, account_created_at, verified, profile_expanded_url), con)
     }
   )
   
