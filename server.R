@@ -55,25 +55,27 @@ function(input, output, session) {
   # Get tweets
   current_tweets <- shiny::eventReactive(input$search_twitter_now, {
     
-    rtweet::search_tweets(q = input$search_twitter_string,
-                          n = input$n_tweets,
-                          type = input$twitter_type_radio,
-                          include_rts = input$include_RT,
-                          token = twitter_token,
-                          lang = input$tweet_lang)
+    if (input$twitter_search_what=="tweets") {
+      rtweet::search_tweets(q = input$search_twitter_string,
+                            n = input$n_tweets,
+                            type = input$twitter_type_radio,
+                            include_rts = input$include_RT,
+                            token = twitter_token,
+                            lang = input$tweet_lang)
+      
+    } else if (input$twitter_search_what=="users") {
+      rtweet::search_users(q = input$search_twitter_string,
+                           n = input$n_tweets,
+                           parse = TRUE,
+                           token = twitter_token,
+                           verbose = FALSE)
+    }
+    
+
     
   })
   
-  current_tweets <- shiny::eventReactive(input$search_twitter_users_now, {
-    
-    rtweet::search_users(q = input$search_twitter_users_string,
-                         n = input$n_tweets_users,
-                         parse = TRUE,
-                         token = twitter_token,
-                         verbose = FALSE)
-    
-  })
-  
+
   output$tweets <- DT::renderDT({
     current_tweets() %>%
       select(screen_name, text) %>% 
@@ -87,7 +89,7 @@ function(input, output, session) {
   output$explore_twitter_users <- DT::renderDT({
     current_tweets() %>%
       distinct(user_id, .keep_all = TRUE) %>% 
-      select(screen_name, description, followers_count, verified, account_created_at, profile_expanded_url) %>% 
+      select(screen_name, name, description, followers_count, verified, account_created_at, profile_expanded_url) %>% 
       mutate(account_created_at = as.Date(account_created_at)) %>% 
       rename(website = profile_expanded_url, followers = followers_count) %>% 
       DT::datatable(options = list(pageLength = 5,

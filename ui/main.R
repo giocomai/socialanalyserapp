@@ -29,6 +29,9 @@ hidden(fluidRow(
       tags$h2("Extract tweets"),
       material_column(material_card(title = "Search Twitter",
         textInput(inputId = "search_twitter_string", label = "Search Twitter"), 
+        material_radio_button(input_id = "twitter_search_what",
+                              label = "What do you want to search?",
+                              as.list(c("tweets", "users"))),
         material_radio_button(input_id = "twitter_type_radio",
                               label = "Search type",
                               as.list(c("recent", "popular", "mixed"))),
@@ -42,13 +45,6 @@ hidden(fluidRow(
                            min = 0, max = 1000, value = 100, round = TRUE),
         material_button(input_id = "search_twitter_now",
                         label = "Search now!", icon = "search")), width = 3),
-      material_column(material_card(title = "Search Twitter users",
-                                    textInput(inputId = "search_twitter_users_string", label = "Search Twitter users"), 
-                                    shiny::sliderInput(inputId = "n_tweets_users",
-                                                       label = "Max number of users to find",
-                                                       min = 0, max = 1000, value = 100, round = TRUE),
-                                    material_button(input_id = "search_twitter_users_now",
-                                                    label = "Search now!", icon = "search")), width = 3),
       material_column(
         uiOutput("cards"),
         width = 3
