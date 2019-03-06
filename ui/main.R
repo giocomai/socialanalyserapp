@@ -31,7 +31,7 @@ hidden(fluidRow(
         textInput(inputId = "search_twitter_string", label = "Search Twitter"), 
         material_radio_button(input_id = "twitter_search_what",
                               label = "What do you want to search?",
-                              as.list(c("tweets", "users"))),
+                              as.list(c("tweets", "users", "urls from csv"))),
         material_radio_button(input_id = "twitter_type_radio",
                               label = "Search type",
                               as.list(c("recent", "popular", "mixed"))),
@@ -53,6 +53,9 @@ hidden(fluidRow(
         shinymaterial::material_card(title = "URL import",
                                      shinymaterial::material_file_input(input_id = "url_input_file", label = "Upload csv"),
                                      tableOutput("preview_urls")),
+        # shinymaterial::material_card(title = "Search URLs on Twitter",
+        #                              material_button(input_id = "search_url_on_twitter_now",
+        #                                              label = "Search URLs on Twitter", icon = "search")),
         width = 3
       )
     ),

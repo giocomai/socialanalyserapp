@@ -50,34 +50,37 @@ function(input, output, session) {
   }, ignoreNULL = FALSE)
   
   
-  ##### App for signed in user
-  
   ##### Get tweets #####
   current_tweets <- shiny::eventReactive(input$search_twitter_now, {
     
-
-    if (is.null(current_urls())==FALSE) {
-      rtweet::search_tweets2(q = current_urls() %>% pull(1),
+    shinymaterial::material_spinner_show(session, "cards")
+    
+    if (input$twitter_search_what=="urls from csv") {
+      temp <- rtweet::search_tweets2(q = current_urls() %>% pull(1),
                              n = input$n_tweets,
                              type = input$twitter_type_radio,
                              include_rts = input$include_RT,
                              token = twitter_token,
                              lang = input$tweet_lang)
     } else if (input$twitter_search_what=="tweets") {
-      rtweet::search_tweets(q = input$search_twitter_string,
-                            n = input$n_tweets,
-                            type = input$twitter_type_radio,
-                            include_rts = input$include_RT,
-                            token = twitter_token,
-                            lang = input$tweet_lang)
+      temp <- rtweet::search_tweets2(q = input$search_twitter_string,
+                             n = input$n_tweets,
+                             type = input$twitter_type_radio,
+                             include_rts = input$include_RT,
+                             token = twitter_token,
+                             lang = input$tweet_lang)
       
     } else if (input$twitter_search_what=="users") {
-      rtweet::search_users(q = input$search_twitter_string,
+      temp <- rtweet::search_users(q = input$search_twitter_string,
                            n = input$n_tweets,
                            parse = TRUE,
                            token = twitter_token,
                            verbose = FALSE)
     }
+    
+    shinymaterial::material_spinner_hide(session, "cards")
+    
+    temp
 
   })
   
@@ -115,12 +118,15 @@ function(input, output, session) {
   
   output$cards <- renderUI({
     
+    if (is.null(current_tweets())) {
+      return(NULL)
+    }
+    
     if(nrow(current_tweets()) == 0){
       return(NULL)
     }
     
 
-    
     cards <- tagList()
     
     cards[[1]] <- 
@@ -260,7 +266,8 @@ function(input, output, session) {
       return(NULL)
     }
     
-    tempTweets <- current_tweets() %>% 
+    tempTweets <- current_tweets() %>%
+      distinct(user_id, screen_name) %>% 
       slice(input$explore_twitter_users_rows_selected)
     
     nrowTempTweets <- nrow(tempTweets)
