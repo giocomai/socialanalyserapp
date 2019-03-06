@@ -119,8 +119,7 @@ function(input, output, session) {
       return(NULL)
     }
     
-    #--- Show the spinner ---#
-    material_spinner_show(session, "get_tweets")
+
     
     cards <- tagList()
     
@@ -133,7 +132,7 @@ function(input, output, session) {
         HTML(
           scales::number(nrow(current_tweets()))
         ))
-    
+
     cards[[2]] <- material_card(
       title = HTML(
         "Number of users"
@@ -157,10 +156,9 @@ function(input, output, session) {
       downloadButton(outputId = "download_tweets",
                      label =  "Download tweets")
     )
-    
-    #--- Hide the spinner ---#
-    material_spinner_hide(session, "get_tweets")
-    cards
+    cards   
+
+
   })
   
   # output$n_tweets <- renderValueBox({
