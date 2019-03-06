@@ -252,6 +252,10 @@ function(input, output, session) {
         )
       )
     }
+    
+
+    
+    
     material_row(wall)
   })
   
@@ -282,6 +286,9 @@ function(input, output, session) {
         )
       )
     }
+    wall[[(nrowTempTweets+1)]] <- shinymaterial::material_column(width = 12, 
+                                                                 downloadButton(outputId = "download_selected_twitter_users",
+                                                                                label =  "Download selected twitter users"))
     material_row(wall)
   })
   
@@ -333,7 +340,7 @@ function(input, output, session) {
     }
   )
   
-  #### Facebook engagement
+  #### Facebook engagement ####
   
   
   fb_engagement_df <- shiny::eventReactive(input$find_facebook_engagement_now, {
@@ -390,6 +397,18 @@ function(input, output, session) {
     content = function(con) {
       write.csv(current_tweets() %>% 
                   select(screen_name, name, description, location, followers_count, friends_count, account_created_at, verified, profile_expanded_url), con)
+    }
+  )
+  
+  output$download_selected_twitter_users <- downloadHandler(
+    filename = function() {
+      paste('twitter_users-', Sys.Date(), '.csv', sep='')
+    },
+    content = function(con) {
+      write.csv(current_tweets() %>%
+                  distinct(user_id, .keep_all = TRUE) %>% 
+                  select(screen_name, name, description, location, followers_count, friends_count, account_created_at, verified, profile_expanded_url) %>% 
+                           slice(input$explore_twitter_users_rows_selected), con)
     }
   )
   
