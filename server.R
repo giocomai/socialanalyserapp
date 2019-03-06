@@ -52,10 +52,18 @@ function(input, output, session) {
   
   ##### App for signed in user
   
-  # Get tweets
+  ##### Get tweets #####
   current_tweets <- shiny::eventReactive(input$search_twitter_now, {
     
-    if (input$twitter_search_what=="tweets") {
+
+    if (is.null(current_urls())==FALSE) {
+      rtweet::search_tweets2(q = current_urls() %>% pull(1),
+                             n = input$n_tweets,
+                             type = input$twitter_type_radio,
+                             include_rts = input$include_RT,
+                             token = twitter_token,
+                             lang = input$tweet_lang)
+    } else if (input$twitter_search_what=="tweets") {
       rtweet::search_tweets(q = input$search_twitter_string,
                             n = input$n_tweets,
                             type = input$twitter_type_radio,
@@ -70,9 +78,7 @@ function(input, output, session) {
                            token = twitter_token,
                            verbose = FALSE)
     }
-    
 
-    
   })
   
 
@@ -113,6 +119,9 @@ function(input, output, session) {
       return(NULL)
     }
     
+    #--- Show the spinner ---#
+    material_spinner_show(session, "get_tweets")
+    
     cards <- tagList()
     
     cards[[1]] <- 
@@ -149,6 +158,8 @@ function(input, output, session) {
                      label =  "Download tweets")
     )
     
+    #--- Hide the spinner ---#
+    material_spinner_hide(session, "get_tweets")
     cards
   })
   
@@ -322,12 +333,12 @@ function(input, output, session) {
   
   fb_engagement_df <- shiny::eventReactive(input$find_facebook_engagement_now, {
     
-    #--- Show the spinner ---#
-    material_spinner_show(session, "fb_engagement_dt")
-    
     in_file <- input$url_input_file
     
     if (is.null(in_file)) return(NULL)
+    
+    #--- Show the spinner ---#
+    material_spinner_show(session, "fb_engagement_dt")
     
     current_urls <- as_tibble(read.csv(file = in_file$datapath, stringsAsFactors = FALSE))
     
