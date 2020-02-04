@@ -252,10 +252,7 @@ function(input, output, session) {
         )
       )
     }
-    
 
-    
-    
     material_row(wall)
   })
   
@@ -340,6 +337,43 @@ function(input, output, session) {
     }
   )
   
+  #### Make screenshots####
+  
+  session_random_string <- stringi::stri_rand_strings(n = 1,
+                                                      length = 12,
+                                                      pattern = "[A-Za-z0-9]")
+  
+  output$all_urls <- renderTable(
+    if (is.null(current_urls())==FALSE) {
+      current_urls() %>% 
+        rename(urls = 1) %>% 
+        select(urls)
+    }
+  )
+  
+  output$download_screenshots <- downloadHandler(
+    filename = function() {
+      paste0("screenshots-", session_random_string, ".zip")
+    },
+    content = function(file) {
+      base_path <- fs::path(tempdir(),
+                            session_random_string)
+      file_names <- current_urls() %>% 
+        dplyr::pull(1) %>% 
+        str_replace_all(pattern = "[[:punct:]]", replacement = "_") %>% 
+        stringr::str_remove(pattern = stringr::regex("https?___"))
+      fs::dir_create(base_path)
+      webshot::webshot(url = current_urls() %>% dplyr::pull(1),
+              file = fs::path(base_path, paste0(file_names, ".png")),
+              vwidth = 1024)
+      zip(zipfile = file,
+          files = fs::dir_ls(path = base_path,
+                             glob = "*.png"), flags = "-j")
+    }
+  )
+  
+  
+  
   #### Facebook engagement ####
   
   
@@ -421,6 +455,7 @@ function(input, output, session) {
                   select(screen_name, text, user_id, status_id, created_at, source, reply_to_status_id, is_quote, is_retweet, favorite_count, retweet_count,  name, description, location, followers_count, friends_count, account_created_at, verified, profile_expanded_url), con)
     }
   )
+  
   
   
 }

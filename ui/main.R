@@ -13,13 +13,14 @@ hidden(fluidRow(
       material_side_nav_tabs(
         side_nav_tabs = c(
           "Extract Tweets" = "extract_tweets",
+          "Download screenshots" = "download_screenshots",
           "Manage projects" = "manage_projects",
           "Explore Tweets" = "explore_tweets",
           "Tweet wall" = "tweet_wall",
           "Explore Twitter users" = "explore_twitter_users",
           "Facebook engagement" = "explore_facebook_engagement"
         ),
-        icons = c("search", "folder", "explore", "dashboard", "people", "thumb_up")
+        icons = c("search", "fullscreen", "folder", "explore", "dashboard", "people", "thumb_up")
       )
     ),
     
@@ -59,6 +60,23 @@ hidden(fluidRow(
         width = 3
       )
     ),
+    ##### Download screenshots #####
+    material_side_nav_tab_content(
+      side_nav_tab_id = "download_screenshots",
+      tags$h2("Download screenshots"),
+      material_row(
+        material_column(
+          material_card(title = "",
+                        downloadButton(outputId = "download_screenshots",
+                                       label =  "Download as png"))  
+        ), 
+        material_column(
+          material_card(title = "URLs to be screenshotted", 
+                        tableOutput("all_urls"))
+        )
+      )), 
+    
+    
     ##### Manage projects #####
     material_side_nav_tab_content(
       side_nav_tab_id = "manage_projects",
